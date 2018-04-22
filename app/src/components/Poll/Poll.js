@@ -1,8 +1,10 @@
 import React, { Component } from "react";
+import contract from "truffle-contract";
+import CondorcetDefinition from "../../../build/contracts/Condorcet.json";
+import { computeWinnerIndex } from "../../utils/algos";
+
 import styles from "./Poll.css";
 
-import CondorcetDefinition from "../../../build/contracts/Condorcet.json";
-import contract from "truffle-contract";
 
 class Poll extends Component {
   state = {
@@ -12,7 +14,7 @@ class Poll extends Component {
     hasVoted: false,
     isSubmitting: false,
     votes: [],
-    outcome: []
+    winnerIndex: null
   };
 
   componentDidMount = () => {
@@ -54,7 +56,7 @@ class Poll extends Component {
   };
 
   listenForChanges = () => {
-    this.state.contract.StateUpdate({})
+    this.state.contract.StateUpdate({}, {fromBlock: 0, toBlock: 'latest'})
       .watch(this.handleStateUpdate);
   };
 
@@ -63,9 +65,16 @@ class Poll extends Component {
       return this.setState({ error });
     }
 
-    this.setState({
-      outcome: results.args.stateMatrix
-    });
+    const cleanedFlatMatrix = results.args.stateMatrix.map(el => el.toNumber());
+    const numCandidates = results.args.numCandidates.toNumber();
+    const winnerIndex = computeWinnerIndex(cleanedFlatMatrix, numCandidates);
+
+    this.setState({ winnerIndex });
+  };
+
+  getWinner = () => {
+    const { winnerIndex, candidates } = this.state;
+    return winnerIndex >= 0 && candidates[winnerIndex];
   };
 
   candidateFromHex = c => {
@@ -115,6 +124,7 @@ class Poll extends Component {
 
   render() {
     const availableCandidates = this.candidatesNotYetVotedFor();
+    const winner = this.getWinner();
 
     return (
       <div className={styles.Poll}>
@@ -165,18 +175,16 @@ class Poll extends Component {
             </button>
           }
 
-          {this.state.error && <p className={styles.error}>{this.state.error.toString()}</p>}
+          {this.state.error && 
+            <p className={styles.error}>{this.state.error.toString()}</p>
+          }
 
           {this.state.hasVoted && 
-            <div>
-              <h3>Thanks for voting!</h3>
-              
-              {this.state.outcome && 
-                <code>
-                  {JSON.stringify(this.state.outcome, null, 2)}
-                </code>
-              }
-            </div>
+            <h3>Thanks for voting!</h3>
+          }
+
+          {winner && 
+            <h3>The winner is: {winner.name}</h3>
           }
         
         </div>
