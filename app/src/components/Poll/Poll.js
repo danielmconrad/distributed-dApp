@@ -85,28 +85,29 @@ class Poll extends Component {
     }
 
     this.setState({ isSubmitting: true });
-    this.state.contract.castVote(this.candidatesRanking())
-      .then(() => {
 
-      })
-      .catch(error => {
+    this.state.contract
+      .castVote(this.voteRanking(), { from: this.state.account })
+      .then(results => {
         this.setState({ 
-          error: error, 
-          isSubmitting: false 
-        }); 
-      });
+          isSubmitting: false, 
+          hasVoted: true,
+        });
 
-    Promise.resolve().then(() => {
-      this.setState({ 
-        isSubmitting: false, 
-        hasVoted: true,
-      });
-    });
+        this.fetchResults();
+      })
+      .catch(error => this.setState({ error, isSubmitting: false }));
   };
 
-  candidatesRanking = () => {
+  voteRanking = () => {
     return this.state.candidates.map(c => this.state.votes.indexOf(c));
   };
+  
+  fetchResults = () => {
+    this.props.web3.state()
+      .then(r => console.log(r))
+      .catch(e => console.log(e));
+  }
 
   render() {
     const availableCandidates = this.candidatesNotYetVotedFor();
@@ -160,7 +161,7 @@ class Poll extends Component {
             </button>
           }
 
-          {this.state.error && <p className={styles.error}>{this.state.error}</p>}
+          {this.state.error && <p className={styles.error}>{this.state.error.toString()}</p>}
 
           {this.state.hasVoted && 
             <div>

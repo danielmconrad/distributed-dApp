@@ -6,11 +6,11 @@ contract Condorcet {
   The key of the mapping is candidate name stored as type bytes32 and value is
   an unsigned integer to store the vote count
   */
-  event StateUpdate(uint[4][4] state);
+  event StateUpdate();
 
   mapping (bytes32 => uint8) public votesReceived;
   uint numCandidates;
-  uint [4][4] public stateMatrix;
+  uint [][] public stateMatrix;
 
   /* Solidity doesn't let you pass in an array of strings in the constructor (yet).
   We will use an array of bytes32 instead to store the list of candidates
@@ -27,10 +27,18 @@ contract Condorcet {
     numCandidates = candidateNames.length;
     
     for (uint i = 0; i < numCandidates; i++) {
-      for (uint j = 0; i < numCandidates; j++) {
-        stateMatrix[i][j] = 0;
-      }
+      uint[] memory inner = new uint[](numCandidates);
+      stateMatrix.push(inner);
     }
+  }
+
+  // DOESN'T WORK
+  // function state() public view returns (uint[][]) {
+  //   return stateMatrix;
+  // }
+
+  function candidates() public view returns (bytes32[]) {
+    return candidateList;
   }
 
   /**
@@ -45,7 +53,7 @@ contract Condorcet {
         }
       }
     }
-    emit StateUpdate(stateMatrix);
+    emit StateUpdate();
   }
   
   // This function returns the total votes a candidate has received so far
