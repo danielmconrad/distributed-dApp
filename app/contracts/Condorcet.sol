@@ -44,4 +44,8 @@ contract Condorcet {
     }
     return false;
   }
+
+  function numCandidates() view public returns (uint256) {
+    return candidateList.length;
+  }
 }
