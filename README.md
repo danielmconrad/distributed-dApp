@@ -12,18 +12,18 @@ docker-compose up
 
 ### Add a new dependency
 `docker-compose run app yarn add DEPENDENCY`
+  
+### Test dapp:            
+`docker-compose run app yarn test`
+  
+### Run dev server:       
+`docker-compose run app yarn start`
+  
+### Build for production: 
+`docker-compose run app yarn build`
 
 ### Migrate:              
 `docker-compose run app truffle migrate`
   
 ### Test contracts:       
 `docker-compose run app truffle test`
-  
-### Test dapp:            
-`docker-compose run app npm test`
-  
-### Run dev server:       
-`docker-compose run app npm run start`
-  
-### Build for production: 
-`docker-compose run app npm run build`
