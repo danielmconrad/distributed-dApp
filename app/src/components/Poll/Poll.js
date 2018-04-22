@@ -9,11 +9,25 @@ class Poll extends Component {
     contract: null,
     candidates: [],
     votes: [],
-    minimumVoteCount: 3
+    isSubmitting: false,
+    hasVoted: false
   };
 
   componentDidMount = () => {
-    this.fetchContract().then(() => this.fetchCandidates());
+    this.fetchContract()
+      .then(() => this.fetchAccount())
+      .then(() => this.fetchCandidates());
+  };
+
+  fetchAccount = () => {
+    return new Promise((resolve, reject) => {
+      this.props.web3.eth.getAccounts((error, accounts) => {
+        if (error) {
+          return reject(error);
+        }
+        this.setState({ account: accounts[0] }, resolve);
+      });
+    });
   };
 
   fetchContract = () => {
@@ -23,9 +37,7 @@ class Poll extends Component {
 
     return new Promise((resolve, reject) => {
       Condorcet.deployed()
-        .then(contract => {
-          this.setState({ contract }, () => resolve());
-        })
+        .then(contract => this.setState({ contract }, resolve))
         .catch(reject);
     });
   };
@@ -43,6 +55,12 @@ class Poll extends Component {
     return { id: name, name };
   };
 
+  candidatesNotYetVotedFor = () => {
+    return this.state.candidates.filter(c => {
+      return this.state.votes.indexOf(c) < 0
+    });
+  };
+
   addCandidate = candidate => {
     this.setState({
       votes: [...this.state.votes, candidate]
@@ -57,28 +75,41 @@ class Poll extends Component {
 
   hasVotedFor = (candidate) => {
     return this.state.votes.indexOf(candidate) >= 0;
-  }
+  };
 
   canSubmit = () => {
-    return this.state.votes.length >= this.state.minimumVoteCount
-  }
+    const { votes, candidates } = this.state;
+    return votes.length > 0 && votes.length === candidates.length;
+  };
+
+  submitVote = () => {
+    if (this.state.isSubmitting) {
+      return;
+    }
+    
+    this.setState({ isSubmitting: true });
+    // this.state.contract.castVote(this.state.votes)
+  };
 
   render() {
+    const availableCandidates = this.candidatesNotYetVotedFor();
+
     return (
       <div className={styles.Poll}>
-        <h2>Meet the candidates</h2>
-        <p>Choose at least three candidates in the order you prefer.</p>
+        <h2>Make your choices</h2>
+        {availableCandidates.length 
+          ? <p>Select the candidates in the order you prefer.</p>
+          : <p>All done!</p>
+        }
         <div className={styles.candidates}>
-          {this.state.candidates.map(candidate => (
-            this.hasVotedFor(candidate) 
-              ? null 
-              : <button 
-                  key={candidate.id} 
-                  className="pure-button"
-                  onClick={() => this.addCandidate(candidate)}
-                >
-                  {candidate.name}
-                </button>
+          {availableCandidates.map(candidate => (
+            <button 
+              key={candidate.id} 
+              className="pure-button"
+              onClick={() => this.addCandidate(candidate)}
+            >
+              {candidate.name}
+            </button>
           ))}
         </div>
 
@@ -97,9 +128,17 @@ class Poll extends Component {
 
         <div className={styles.submitSection}>
           {this.canSubmit() &&
-            <button className="pure-button pure-button-primary">
-              Submit Votes
+            <button 
+              disabled={this.state.isSubmitting}
+              className="pure-button pure-button-primary"
+              onClick={this.submitVote}
+            >
+              Cast your Vote!
             </button>
+          }
+
+          {this.state.hasVoted && 
+            <p>Thanks for voting!</p>
           }
         </div>
       </div>
