@@ -12,15 +12,14 @@ class Poll extends Component {
     hasVoted: false,
     isSubmitting: false,
     votes: [],
-    results: []
+    outcome: []
   };
 
   componentDidMount = () => {
     this.fetchContract()
       .then(() => this.fetchAccount())
-      .then(() => this.fetchCandidates());
-
-    this.props.web3.eth.subscribe('StateUpdate', {}, this.handleStateUpdate);
+      .then(() => this.fetchCandidates())
+      .then(() => this.listenForChanges())
   };
 
   fetchAccount = () => {
@@ -52,6 +51,21 @@ class Poll extends Component {
       .then(candidates => candidates.map(this.candidateFromHex))
       .then(candidates => this.setState({ candidates }))
       .catch(err => console.log(err));
+  };
+
+  listenForChanges = () => {
+    this.state.contract.StateUpdate({})
+      .watch(this.handleStateUpdate);
+  };
+
+  handleStateUpdate = (error, results) => {
+    if (error) {
+      return this.setState({ error });
+    }
+
+    this.setState({
+      outcome: results.args.stateMatrix
+    });
   };
 
   candidateFromHex = c => {
@@ -98,10 +112,6 @@ class Poll extends Component {
   voteRanking = () => {
     return this.state.candidates.map(c => this.state.votes.indexOf(c));
   };
-
-  handleStateUpdate = (error, results) => {
-    debugger;
-  }
 
   render() {
     const availableCandidates = this.candidatesNotYetVotedFor();
@@ -159,10 +169,16 @@ class Poll extends Component {
 
           {this.state.hasVoted && 
             <div>
-              <h3>Thanks for voting! Here are the results so far:</h3>
+              <h3>Thanks for voting!</h3>
               
+              {this.state.outcome && 
+                <code>
+                  {JSON.stringify(this.state.outcome, null, 2)}
+                </code>
+              }
             </div>
           }
+        
         </div>
       </div>
     );

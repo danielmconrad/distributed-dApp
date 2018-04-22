@@ -21,7 +21,7 @@ class App extends Component {
   componentWillMount = () => {
     getWeb3
       .then(results => this.setState({ web3: results.web3 }))
-      .catch(() => console.log(ERR_NO_WEB3));
+      .catch(err => console.log(err, ERR_NO_WEB3));
   }
 
   render() {
