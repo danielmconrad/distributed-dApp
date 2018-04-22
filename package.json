@@ -59,7 +59,7 @@
     "truffle": "^4.1.7"
   },
   "scripts": {
-    "dev": "npm run migrate:reset && npm run start",
+    "dev": "npm run migrate:reset && npm run start ",
     "migrate": "truffle migrate",
     "migrate:reset": "truffle migrate --reset",
     "start": "node scripts/start.js",

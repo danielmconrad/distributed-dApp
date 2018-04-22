@@ -8,11 +8,12 @@ services:
       - "8545:8545"
 
   app:
-    restart: always
     build: .
+    command: npm run dev
     container_name: app
     volumes:
-      - ./app:/app
+      - ./:/usr/app
+      - /usr/app/node_modules
     ports:
       - "3000:3000"
     depends_on:
