@@ -8,14 +8,19 @@ import styles from './App.css'
 const ERR_NO_WEB3 = 'Error finding web3.';
 
 class App extends Component {
-  state = {
-    storageValue: 0,
-    web3: null
-  };
 
-  componentWillMount() {
+  constructor(params) {
+    super(params);
+
+    this.state = {
+      storageValue: 0,
+      web3: null
+    };
+  }
+
+  componentWillMount = () => {
     getWeb3
-      .then(({web3}) => this.setState({ web3 }))
+      .then(results => this.setState({ web3: results.web3 }))
       .catch(() => console.log(ERR_NO_WEB3));
   }
 
@@ -29,7 +34,7 @@ class App extends Component {
     return (
       <div className={styles.App}>
         <Header web3={this.state.web3} />
-        <Polls />
+        <Polls web3={this.state.web3} />
       </div>
     );
   }
