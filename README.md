@@ -12,17 +12,17 @@ docker-compose up
 
 ```bash
   # Migrate:              
-  truffle migrate
+  docker-compose run app truffle migrate
   
   # Test contracts:       
-  truffle test
+  docker-compose run app truffle test
   
   # Test dapp:            
-  npm test
+  docker-compose run app npm test
   
   # Run dev server:       
-  npm run start
+  docker-compose run app npm run start
   
   # Build for production: 
-  npm run build
+  docker-compose run app npm run build
 ```
