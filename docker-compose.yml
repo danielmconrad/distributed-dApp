@@ -8,12 +8,11 @@ services:
       - "8545:8545"
 
   app:
-    build: .
-    command: npm run dev
+    build: ./app
+    command: yarn dev
     container_name: app
     volumes:
-      - ./:/usr/app
-      - /usr/app/node_modules
+      - ./app:/usr/app
     ports:
       - "3000:3000"
     depends_on:
