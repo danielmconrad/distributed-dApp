@@ -4,6 +4,10 @@ body {
   font-family: 'Didact Gothic', sans-serif;
 }
 
+h1 {
+  margin-bottom: 2em;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-weight: normal;
   font-family: 'Playfair Display', serif;
