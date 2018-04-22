@@ -3,7 +3,7 @@
 
 ### Installation
 ```bash
-git clone ...
+git clone git@github.com:danmconrad/distributed-dApp.git
 docker-compose build
 docker-compose up
 ```
