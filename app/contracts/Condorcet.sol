@@ -6,11 +6,11 @@ contract Condorcet {
   The key of the mapping is candidate name stored as type bytes32 and value is
   an unsigned integer to store the vote count
   */
-  event StateUpdate();
+  event StateUpdate(uint[] stateMatrix, uint numCandidates);
 
   mapping (bytes32 => uint8) public votesReceived;
   uint numCandidates;
-  uint [][] public stateMatrix;
+  uint [] public stateMatrix;
 
   /* Solidity doesn't let you pass in an array of strings in the constructor (yet).
   We will use an array of bytes32 instead to store the list of candidates
@@ -25,11 +25,7 @@ contract Condorcet {
   constructor(bytes32[] candidateNames) public {
     candidateList = candidateNames;
     numCandidates = candidateNames.length;
-    
-    for (uint i = 0; i < numCandidates; i++) {
-      uint[] memory inner = new uint[](numCandidates);
-      stateMatrix.push(inner);
-    }
+    stateMatrix = new uint[](numCandidates * numCandidates);
   }
 
   // DOESN'T WORK
@@ -44,16 +40,18 @@ contract Condorcet {
   /**
    * parse vote, assuming complete, distinct rankings
    */
-  function parseVote(uint [] vote) public returns (bool)
+  function parseVote(uint[] vote) public returns (bool)
   {
-    for (uint i = 0; i < vote.length; i++) {
-      for (uint j = i; j < vote.length; j++) {
-        if(vote[i] < vote[j]){
-          stateMatrix[i][j]++;
+    for (uint i = 0; i < numCandidates ** 2; i++) {
+        uint cand1 = i/numCandidates;
+        uint cand2 = i%numCandidates;
+        // candidate 1 preferred to candidate 2
+        if(vote[cand1] < vote[cand2])
+        {
+          stateMatrix[i]++;
         }
-      }
     }
-    emit StateUpdate();
+    emit StateUpdate(stateMatrix, numCandidates);
   }
   
   // This function returns the total votes a candidate has received so far
