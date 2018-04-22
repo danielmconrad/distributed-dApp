@@ -3,5 +3,13 @@ var Condorcet = artifacts.require("./Condorcet.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(SimpleStorage);
-  deployer.deploy(Condorcet, ['Trump', 'Clinton']);
+  deployer.deploy(Condorcet, [
+    'Lion', 
+    'Tiger', 
+    'Jaguar', 
+    'Leopard', 
+    'Snow Leopard', 
+    'Cheetah', 
+    'Puma'
+  ]);
 };

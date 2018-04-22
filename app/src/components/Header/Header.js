@@ -3,7 +3,7 @@ import styles from './Header';
 
 const Header = () => (
   <div className={styles.Header}>
-    HEADER
+    <h1>Condorcet Polling</h1>
   </div>
 );
 
