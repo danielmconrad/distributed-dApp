@@ -12,12 +12,15 @@ class Poll extends Component {
     hasVoted: false,
     isSubmitting: false,
     votes: [],
+    results: []
   };
 
   componentDidMount = () => {
     this.fetchContract()
       .then(() => this.fetchAccount())
       .then(() => this.fetchCandidates());
+
+    this.props.web3.eth.subscribe('StateUpdate', {}, this.handleStateUpdate);
   };
 
   fetchAccount = () => {
@@ -88,25 +91,16 @@ class Poll extends Component {
 
     this.state.contract
       .castVote(this.voteRanking(), { from: this.state.account })
-      .then(results => {
-        this.setState({ 
-          isSubmitting: false, 
-          hasVoted: true,
-        });
-
-        this.fetchResults();
-      })
+      .then(() => this.setState({ hasVoted: true, isSubmitting: false}))
       .catch(error => this.setState({ error, isSubmitting: false }));
   };
 
   voteRanking = () => {
     return this.state.candidates.map(c => this.state.votes.indexOf(c));
   };
-  
-  fetchResults = () => {
-    this.props.web3.state()
-      .then(r => console.log(r))
-      .catch(e => console.log(e));
+
+  handleStateUpdate = (error, results) => {
+    debugger;
   }
 
   render() {
@@ -166,7 +160,7 @@ class Poll extends Component {
           {this.state.hasVoted && 
             <div>
               <h3>Thanks for voting! Here are the results so far:</h3>
-              result
+              
             </div>
           }
         </div>
