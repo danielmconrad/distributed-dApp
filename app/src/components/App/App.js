@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import getWeb3 from '../../utils/getWeb3'
 import Header from '../Header';
-import Polls from '../Polls';
+import Poll from '../Poll';
 
 import styles from './App.css'
 
@@ -34,7 +34,7 @@ class App extends Component {
     return (
       <div className={styles.App}>
         <Header web3={this.state.web3} />
-        <Polls web3={this.state.web3} />
+        <Poll web3={this.state.web3} />
       </div>
     );
   }

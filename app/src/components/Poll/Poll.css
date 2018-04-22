@@ -1,0 +1,19 @@
+:local .Poll {
+}
+
+:local .candidates {
+  display: flex;
+}
+
+:local .Poll button {
+  margin-right: 10px;
+}
+
+:local .Poll button i {
+  font-size: 0.8em;
+  margin-left: 0.5em;
+}
+
+:local .submitSection {
+  margin-top: 40px;
+}

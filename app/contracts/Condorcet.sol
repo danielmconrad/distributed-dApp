@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 // We have to specify what version of compiler this code will compile with
 
 contract Condorcet {
@@ -6,9 +6,12 @@ contract Condorcet {
   The key of the mapping is candidate name stored as type bytes32 and value is
   an unsigned integer to store the vote count
   */
-  
+  event StateUpdate(uint[4][4] state);
+
   mapping (bytes32 => uint8) public votesReceived;
-  
+  uint numCandidates;
+  uint [4][4] public stateMatrix;
+
   /* Solidity doesn't let you pass in an array of strings in the constructor (yet).
   We will use an array of bytes32 instead to store the list of candidates
   */
@@ -21,12 +24,34 @@ contract Condorcet {
   */
   constructor(bytes32[] candidateNames) public {
     candidateList = candidateNames;
+    numCandidates = candidateNames.length;
+    
+    for (uint i = 0; i < numCandidates; i++) {
+      for (uint j = 0; i < numCandidates; j++) {
+        stateMatrix[i][j] = 0;
+      }
+    }
   }
 
+  /**
+   * parse vote, assuming complete, distinct rankings
+   */
+  function parseVote(uint [] vote) public returns (bool)
+  {
+    for (uint i = 0; i < vote.length; i++) {
+      for (uint j = i; j < vote.length; j++) {
+        if(vote[i] < vote[j]){
+          stateMatrix[i][j]++;
+        }
+      }
+    }
+    emit StateUpdate(stateMatrix);
+  }
+  
   // This function returns the total votes a candidate has received so far
-  function totalVotesFor(bytes32 candidate) view public returns (uint8) {
-    require(validCandidate(candidate));
-    return votesReceived[candidate];
+  function castVote(uint[] vote) public {
+    require(vote.length == numCandidates);
+    parseVote(vote);
   }
 
   // This function increments the vote count for the specified candidate. This
@@ -45,7 +70,7 @@ contract Condorcet {
     return false;
   }
 
-  function numCandidates() view public returns (uint256) {
-    return candidateList.length;
+  function getNumCandidates() view public returns (uint) {
+    return numCandidates;
   }
 }
