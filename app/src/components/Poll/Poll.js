@@ -6,11 +6,12 @@ import contract from "truffle-contract";
 
 class Poll extends Component {
   state = {
-    contract: null,
     candidates: [],
-    votes: [],
+    contract: null,
+    error: null,
+    hasVoted: false,
     isSubmitting: false,
-    hasVoted: false
+    votes: [],
   };
 
   componentDidMount = () => {
@@ -73,13 +74,9 @@ class Poll extends Component {
     });
   };
 
-  hasVotedFor = (candidate) => {
-    return this.state.votes.indexOf(candidate) >= 0;
-  };
-
   canSubmit = () => {
     const { votes, candidates } = this.state;
-    return votes.length > 0 && votes.length === candidates.length;
+    return !this.state.hasVoted && votes.length > 0 && votes.length === candidates.length;
   };
 
   submitVote = () => {
@@ -88,7 +85,27 @@ class Poll extends Component {
     }
 
     this.setState({ isSubmitting: true });
-    // this.state.contract.castVote(this.state.votes)
+    this.state.contract.castVote(this.candidatesRanking())
+      .then(() => {
+
+      })
+      .catch(error => {
+        this.setState({ 
+          error: error, 
+          isSubmitting: false 
+        }); 
+      });
+
+    Promise.resolve().then(() => {
+      this.setState({ 
+        isSubmitting: false, 
+        hasVoted: true,
+      });
+    });
+  };
+
+  candidatesRanking = () => {
+    return this.state.candidates.map(c => this.state.votes.indexOf(c));
   };
 
   render() {
@@ -96,22 +113,23 @@ class Poll extends Component {
 
     return (
       <div className={styles.Poll}>
-        <h2>Make your choices</h2>
-        {availableCandidates.length 
-          ? <p>Select the candidates in the order you prefer.</p>
-          : <p>All done!</p>
+        {availableCandidates.length > 0 &&
+          <div>
+            <h2>Make your choices</h2>
+            <p>Select the candidates in the order you prefer.</p>
+            <div className={styles.candidates}>
+              {availableCandidates.map(candidate => (
+                <button 
+                  key={candidate.id} 
+                  className="pure-button"
+                  onClick={() => this.addCandidate(candidate)}
+                >
+                  {candidate.name}
+                </button>
+              ))}
+            </div>
+          </div>
         }
-        <div className={styles.candidates}>
-          {availableCandidates.map(candidate => (
-            <button 
-              key={candidate.id} 
-              className="pure-button"
-              onClick={() => this.addCandidate(candidate)}
-            >
-              {candidate.name}
-            </button>
-          ))}
-        </div>
 
         {this.state.votes.length > 0 && <h2>Your choices</h2>}
         <div>
@@ -121,7 +139,9 @@ class Poll extends Component {
               className="pure-button"
               onClick={() => this.removeCandidate(candidate)}
             >
-              {i+1}) {candidate.name} <i className="far fa-times-circle"></i>
+              <span className={styles.buttonNumber}>#{i+1}</span> 
+              {candidate.name} 
+              <i className="far fa-times-circle"></i>
             </button>
           ))}
         </div>
@@ -135,13 +155,18 @@ class Poll extends Component {
             >
               {this.state.isSubmitting 
                 ? 'Casting...' 
-                : 'Cast your Vote!'
+                : 'Cast your Vote'
               }
             </button>
           }
 
+          {this.state.error && <p className={styles.error}>{this.state.error}</p>}
+
           {this.state.hasVoted && 
-            <p>Thanks for voting!</p>
+            <div>
+              <h3>Thanks for voting! Here are the results so far:</h3>
+              result
+            </div>
           }
         </div>
       </div>

@@ -1,6 +1,10 @@
 :local .Poll {
 }
 
+:local .error {
+  color: #ff0000;
+}
+
 :local .candidates {
   display: flex;
   flex-wrap: wrap;
@@ -10,9 +14,16 @@
   margin: 0 0.5em 0.5em 0;
 }
 
+:local .buttonNumber {
+  color: #999;
+  display: inline-block;
+  margin-right: 0.4em;
+}
+
 :local .Poll button i {
   font-size: 0.8em;
-  margin-left: 0.5em;
+  margin-left: 0.8em;
+  color: #aaa;
 }
 
 :local .submitSection {
