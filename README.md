@@ -8,6 +8,8 @@ docker-compose build
 docker-compose up
 ```
 
+Configure MetaMask to use the `http://localhost:8545` network.
+
 ## Common Commands
 
 ### Add a new dependency
