@@ -18,3 +18,17 @@
 :local .submitSection {
   margin-top: 40px;
 }
+
+@keyframes throbOpacity {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+:local .submitting :global {
+  animation: throbOpacity 1s infinite;
+  animation-timing-function: ease-in-out;
+}

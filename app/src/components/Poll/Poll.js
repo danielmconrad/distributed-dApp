@@ -86,7 +86,7 @@ class Poll extends Component {
     if (this.state.isSubmitting) {
       return;
     }
-    
+
     this.setState({ isSubmitting: true });
     // this.state.contract.castVote(this.state.votes)
   };
@@ -130,10 +130,13 @@ class Poll extends Component {
           {this.canSubmit() &&
             <button 
               disabled={this.state.isSubmitting}
-              className="pure-button pure-button-primary"
+              className={`${this.state.isSubmitting && styles.submitting} pure-button pure-button-primary`}
               onClick={this.submitVote}
             >
-              Cast your Vote!
+              {this.state.isSubmitting 
+                ? 'Casting...' 
+                : 'Cast your Vote!'
+              }
             </button>
           }
 
