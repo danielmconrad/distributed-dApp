@@ -11,15 +11,20 @@ class Poll extends Component {
     const Condorcet = contract(CondorcetDefinition);
     Condorcet.setProvider(this.props.web3.currentProvider);
 
-    Condorcet.deployed().then(consorcet => {
-      consorcet.numCandidates()
+    // this.state.web3.eth.getAccounts((error, accounts) => {
+    // });
+
+    Condorcet.deployed().then(condorcet => {
+      condorcet.numCandidates()
         .then(cs => {
           debugger;
+          cs.toNumber();
         })
         .catch(err => {
           debugger
         });
     });
+
   }
 
   render() {
